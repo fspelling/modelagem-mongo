@@ -1,0 +1,20 @@
+// Atualizando os documentos de artigos adicionando as informacoes de categorias
+db.artigos.update({}, {
+    $set: {
+        categorias: [ "programacao", "engenharia" ]
+    }
+}, { multi: true });
+
+// Buscando todos os artigos que pertence a categoria "programacao"
+db.artigos.find({ "categorias" : "programacao" });
+
+// Vamos ver como que o find faz todo esse processo de busca dentro de cada documento da collection atraves
+// do metodo explain("executionStats")
+db.artigos.find({ "categorias" : "programacao" }).explain("executionStats");
+
+// No retorno vemos no campo "executionStages" retorna algumas informacoes da execucao dessa busca, 
+// entre elas temos "executionStages.stage", que esta marcado com o valor "COLLSCAN", ou seja, o mongodb ira percorrer
+// a todos os documentos da collection para fazer a busca
+
+// No entanto nao precisamos percorrer a todos os documentos da collection "artigos" para buscar pela categoria,
+// podemos utilizar os recursos dos indices, que veremos na proxima sessao!

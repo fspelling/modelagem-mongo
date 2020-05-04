@@ -1,0 +1,73 @@
+// Vamos migrar os dados da collection de autores para a collection de artigos, e analisando a estrutura
+// vemos que cada documento de autor, possui um array de artigos, logo precisamos de alguma forma
+// migrar esse array de artigos para cada documento na collection "artigos".
+
+// Sabendo disso vamos usar o metodo "aggregate" para realizar essa tranformacao de um array para cada documento,
+// e para isso usaremo o operador $unwind
+db.autores.aggregate([{ $unwind: "$artigos" }]);
+
+// Veremos que cada dado do array de artigo foi tranformado em um documento, porem os dados dos autores tambem estao 
+// retornando, ou seja, as informacoes do autor e do artigo ficaram no mesmo nivel hierarquico, e nao eh o que queremos
+
+// Para resolver esse problema, usaremos tambem um outro operador chamado $project, e eh ele que vai
+// mapear e criar a nova estrutura dos dados de retorno do autor.
+// Vale destacar que o valor do retorno sera necessario utilizar "$" para indicar que nao eh um valor literal que
+// queremos retornar e sim o valor do campo do documento, semelhante ao uma interpolacao como "angular" e outras
+// linguagens
+db.autores.aggregate([{
+    $unwind: "$artigos"
+},{
+    $project: {
+        "autor.nome": "$nome",
+        "autor.email": "$email",
+        "autor.senha": "$senha",
+        "autor.descricao": "$descricao",
+        "titulo": "$artigos.titulo",
+        "descricao": "$artigos.descricao",
+        "slug": "$artigos.slug",
+        "dataCriacao": "$artigos.dataCriacao"
+    }
+}]);
+
+// Pronto, ja temos a nossa estrutura pronta, porem precisamos nos atentar com o campo "_id", pois como ele foi extraido
+// da collection de autores e agora estamos gerando um novo documento para cada artigo, onde antes era um array, logo
+// o _id sera duplicado.
+
+// Para resolver isso vamos remover o _id no retorno, bastando definir o valor do campo como "0" no operador $project
+db.autores.aggregate([{
+    $unwind: "$artigos"
+},{
+    $project: {
+        "autor.nome": "$nome",
+        "autor.email": "$email",
+        "autor.senha": "$senha",
+        "autor.descricao": "$descricao",
+        "titulo": "$artigos.titulo",
+        "descricao": "$artigos.descricao",
+        "slug": "$artigos.slug",
+        "dataCriacao": "$artigos.dataCriacao",
+        "_id": 0
+    }
+}]);
+
+// Para finalizar vamos indicar que esse retorno sera gravado na collection de "artigos" atraves dp operador $out, 
+// lembrando que ele nao adiciona apenas, e sim define que trocamos todos os documentos que ja existe hoje na 
+// collection com esse retorno da query
+db.autores.aggregate([{
+    $unwind: "$artigos"
+},{
+    $project: {
+        "autor.nome": "$nome",
+        "autor.email": "$email",
+        "autor.senha": "$senha",
+        "autor.descricao": "$descricao",
+        "titulo": "$artigos.titulo",
+        "descricao": "$artigos.descricao",
+        "slug": "$artigos.slug",
+        "dataCriacao": "$artigos.dataCriacao",
+        "_id": 0
+    }
+},
+{
+    $out: "artigos"
+}]);

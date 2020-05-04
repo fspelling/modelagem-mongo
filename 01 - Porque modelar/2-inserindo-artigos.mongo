@@ -1,0 +1,17 @@
+// Atualizando autores, adicionando seus artigos
+db.autores.update({},
+{
+    $set: {
+        "artigos" : [{
+            "titulo" : "Apredendo mongodb",
+            "descricao" : "Apredendo mongodbApredendo mongodb...Apredendo mongodb...Apredendo mongodb...Apredendo mongodb...Apredendo mongodb...",
+            "slug" : "apredendo-mongodb",
+            "dataCriacao" : ISODate("2020-05-01T16:01:24.118Z")
+        },{
+            "titulo" : "Apredendo .net",
+            "descricao" : "Apredendo mongodbApredendo mongodb...Apredendo mongodb...Apredendo mongodb...Apredendo mongodb...Apredendo mongodb...",
+            "slug" : "apredendo-net",
+            "dataCriacao" : ISODate("2020-05-01T16:01:24.118Z")
+        }]
+    }
+}, { multi: true });

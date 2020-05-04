@@ -1,0 +1,61 @@
+// Analisando os dados do documento veremos que em cada artigo, temos a informacao do autor, porem um dos dados seria o
+// seu login e senha, o que nao seria interssante, pois esses dados seriam necessarios apenas no login do blog.
+
+// Para solucionar este problema, vamos criar uma nova collection de "autores", e duplicar as informacoes dos autores
+// necessarios na collection de "artigos", assim quando carregar os documentos de artigo nao sera carregado todas as
+// informacoes do autor, so apenas as necessarias.
+
+// Agrupando os dados do autor atraves do metodo aggregate() com o operador $group, vale destacar que o ponto chave
+// para realizar o agrupamento sera pelo campo "_id" que no caso estamos agrupando pelo "autor.email"
+db.artigos.aggregate([{
+    $group: {
+        _id: "$autor.email"
+    }
+}]);
+
+// Agora vamos retornar outros dados do agrupamento usando o operador $first, para buscar o primeiro documento duplicado
+// do seu agrupamento
+db.artigos.aggregate([{
+    $group: {
+        _id: "$autor.email",
+        nome: {
+            $first: "$autor.nome",
+        },
+        email: {
+            $first: "$autor.email"
+        },
+        descricao: {
+            $first: "$autor.descricao"
+        },
+        senha: {
+            $first: "$autor.senha"
+        }
+    }
+}]);
+
+// Agora eh so gravarmos o resultado na collection "autoresInfo" atraves do operador $out, porem tambem precisamos,
+// remover o campo "_id" do resultado na consulta atraves do operador $project, pois na insercao do documento 
+// eh gerado o _id automaticamente
+db.artigos.aggregate([{
+    $group: {
+        _id: "$autor.email",
+        nome: {
+            $first: "$autor.nome",
+        },
+        email: {
+            $first: "$autor.email"
+        },
+        descricao: {
+            $first: "$autor.descricao"
+        },
+        senha: {
+            $first: "$autor.senha"
+        }
+    }
+}, {
+    $project: {
+        _id: 0
+    }
+}, {
+    $out: "autoresInfo"
+}]);

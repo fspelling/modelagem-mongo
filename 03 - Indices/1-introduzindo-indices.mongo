@@ -1,0 +1,17 @@
+// Criando indice de busca na collection de "artigos", onde vamos associar esse indice com o campo categorias de 
+// forma crescente, com isso no find({ categorias: "busca" }) o mongodb nao ira percorrer por todos documentos da 
+// collection, mas apenas nas collections que possuirem o campo "categorias" com o valor informado no find()
+db.artigos.createIndex({ categorias: 1 });
+
+// Agora se executarmos o detalhe da execucao da busca pelo explain("executionStats"), veremos que executionStages.stage
+// esta marcado com o valor FETCH, ou seja, so sera examinado os documentos que tem o indice "categorias" vinculado com
+// o valor "programacao"
+db.artigos.find({ "categorias" : "programacao" }).explain("executionStats");
+
+// Analisando todos os indices criados na collection
+db.artigos.getIndexes();
+
+// Vale destacar que nao eh sempre que devemos utilizar indices, pois em alguns casos pode atrapalhar mais do que ajudar,
+// pois se a collection for muito grande, o espaco da memoria que o indice cria-ra sera maior, outro ponto a analisar tambem
+// que toda vez que for incluido um documento ca collection tambem sera incluido no indice na ordem correta, podendo
+// causar mais lentidao na insercao embora tera um ganho de performance na busca

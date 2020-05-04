@@ -1,0 +1,43 @@
+// Adicionando comentarios na collection de artigos
+db.artigos.update({}, {
+    $set: {
+        comentarios: [{
+            nome: "Eduardo",
+            email: "eduardo@example.org",
+            texto: "Muito bom o post!",
+            data: ISODate('2019-01-23')
+        },{
+            nome: "João",
+            email: "joao@example.org",
+            texto: "Gostei bom o post!",
+            data: ISODate('2019-01-23')
+        },{
+            nome: "Carlos",
+            email: "carlos@example.org",
+            texto: "Não bom o post!",
+            data: ISODate('2019-01-23')
+        }]
+    }
+}, { multi: true });
+
+// Porem se um artigo tiver milhares de comentarios, teremos uma queda de performance, portanto o ideal seria
+// carregar no documento de artigos os 3 primeiros comentarios, e quando quisermos buscar os comenatrios restantes
+// buscaremos na nova collection de "comentarios"
+
+// Sabendo disso, vamos usar o metodo aggregate() com os operadores que ja utilizamos diversas vezes, com os operadores
+// $unwind(quebrar o array de um campo em varios documentos), $project(transformar o resultado em outro resiltado), 
+// $out(gravar o resultado em uma nova collection)
+db.artigos.aggregate([{
+    $unwind: "$comentarios"
+}, {
+    $project: {
+        _id: 0,
+        artigoId: "$_id",
+        nome: "$comentarios.nome",
+        email: "$comentarios.email",
+        texto: "$comentarios.texto",
+        data: "$comentarios.data"
+    }
+}, {
+    $out: "comentarios"
+}]);

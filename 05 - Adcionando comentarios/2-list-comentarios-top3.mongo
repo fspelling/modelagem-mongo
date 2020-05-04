@@ -1,0 +1,26 @@
+// Vamos buscar todos os documentos que existem o campo "comentarios"
+db.artigos.find({
+    comentarios: {
+        $exists: true
+    }
+});
+
+// Em seguida vamos iterar em cada documento pelo metodo forEach(), onde vamos manter o 3 primeiros comentarios
+// de cada artigo, removendo os outros comentarios existentes
+db.artigos.find({
+    comentarios: {
+        $exists: true
+    }
+}).forEach(function(artigo) {
+    artigo.comentarios = db.comentarios.find({
+        artigoId: artigo._id
+    }, {
+        "_id" : 0,
+        "nome" : 1,
+        "email" : 1,
+        "texto" : 1,
+        "data" : 1
+    }).sort({ nome: 1 }).limit(3).toArray();
+    
+    db.artigos.save(artigo);
+});

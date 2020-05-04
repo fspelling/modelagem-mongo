@@ -1,0 +1,14 @@
+// Modelando nova estrura, pois a maioria das operacoes serao feitas com base nas informacoes de artigos,
+// e nao de autores como esta ate entao
+db.artigo.insert({
+    "titulo" : "Apredendo ciclano",
+    "descricao" : "Apredendo ciclano ciclano...Apredendo mongciclanoodb...Apredendo ciclano...Apredendo mociclanongodb...Apredendo mongodb...",
+    "slug" : "apredendo-mongodb",
+    "dataCriacao" : ISODate(),
+    "autor" : {
+        "descricao" : "Aluno na Alura",
+        "email" : "ciclano@alura.com.br",
+        "nome" : "Ciclano",
+        "senha" : "senha",
+    }
+});

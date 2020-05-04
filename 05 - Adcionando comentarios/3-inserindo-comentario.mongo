@@ -1,0 +1,62 @@
+// Removendo o ultimo comentario do artigo "Apredendo mongodb" do autor "Fernando Spelling"
+db.artigos.update({
+    "autor.nome": "Fernando Spelling",
+    titulo: "Apredendo mongodb"
+}, {
+    $pop: {
+        comentarios: 1
+    }
+});
+
+// Adicionando comentarios do artigo "Apredendo mongodb" do autor "Fernando Spelling" na ultima com o operador $push,
+// vale destacar que por padrao o o item do push sera adicionado na ultima posicao do array, logo como queremos que
+// os comentarios seja adiconado no inicio do array vamos informar um operador chamado $position para informar a posicao
+// que sera adicionado no array
+db.artigos.update({
+    "autor.nome": "Fernando Spelling",
+    titulo: "Apredendo mongodb"
+}, {
+    $push: {
+        comentarios: {
+            $position: 0,
+            $each: [{
+                "nome" : "Fernando",
+                "email" : "fernando@example.org",
+                "texto" : "Muito bom o post!",
+                "data" : ISODate()
+            }]
+        }
+    }
+});
+
+// Porem nao vamos atualizar dessa maneira, pois como ja vimos temos que manter as informacoes dos comentarios na
+// collection de comentarios, pois eh la que ficara todos os comentarios do artigo para serem consultados quando
+// realmente precisar
+
+// Sabendo disso, vamos atualzar com o metodo findOneAndUpdate(), pois assim que atualizarmos o artigo retornaremos
+// seu _id para depois incluirmos esse novo comentario na collection de "comentarios" com o id do artigo referenciado,
+// e isso ocorre atraves do terceiro parametro { returnNewDocument: true }
+let artigo = db.artigos.findOneAndUpdate({
+    "autor.nome": "Fernando Spelling",
+    titulo: "Apredendo mongodb"
+}, {
+    $push: {
+        comentarios: {
+            $position: 0,
+            $each: [{
+                "nome" : "Fernando",
+                "email" : "fernando@example.org",
+                "texto" : "Muito bom o post!",
+                "data" : ISODate()
+            }]
+        }
+    }
+}, { returnNewDocument: true });
+
+db.comentarios.insertOne({
+    artigoId: artigo._id,
+    "nome" : "Fernando",
+    "email" : "fernando@example.org",
+    "texto" : "Muito bom o post!",
+    "data" : ISODate()
+});

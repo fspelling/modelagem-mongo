@@ -1,0 +1,15 @@
+// Buscando artigos pelo slug "apredendo-mongodb"
+db.autores.find({ "artigos.slug" : "apredendo-mongodb" });
+
+// Buscando artigos pelo slug "apredendo-mongodb" retornando apenas os campos o titulo e a descricao
+db.autores.find({ "artigos.slug" : "apredendo-mongodb" }, { "artigos.titulo" : 1, "artigos.descricao" : 1 });
+
+// Buscando todos os artigos do Fernando Spelling
+db.autores.find({ nome : "Fernando Spelling" }, { artigos : 1 });
+
+// Se analisarmos, veremos um erro na nossa modelagem!!!
+
+// Pois todas as nossas consultas acima estamos querendo buscar os "artigos", e mesmo assim 
+// somos obrigados a buscar pela collection de "autores".
+// No mongodb uma boa pratica de modelagem eh definir uma collection onde teremos mais operacoes em cima dela,
+// ja as entidades relacionada a ela ficaria numa hierarquia abaixo.

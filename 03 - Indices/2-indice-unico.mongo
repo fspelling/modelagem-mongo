@@ -1,0 +1,2 @@
+// Vamos criar um indice "unico" no campo "slug", pois nao queremos ter mais de um documento com o mesmo slug duplicado
+db.artigos.createIndex({ slug: 1 }, { unique: true });

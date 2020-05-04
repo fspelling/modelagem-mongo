@@ -1,0 +1,35 @@
+// Vamos referenciar no documento artigo no campo "autor" o "_id" que ele pertence, depois podemos excluir as informacoes
+// do login e senha do autor no documento de artigo. Vale destacar que vamos fazer esse tratamento atraves de um
+// script usando funcao js
+db.artigos.find().forEach(function(artigo) {
+    let infoAutor = db.autoresInfo.findOne({ email: artigo.autor.email }); 
+    artigo.autor.autorId = infoAutor._id;
+    
+    delete artigo.autor.email;
+    delete artigo.autor.senha;
+    
+    db.artigos.save(artigo);
+});
+
+// Atualizando o sobrenome do autor "Fernando" agora nas duas collection(artigos e autoresInfo), 
+// ja que agora temos informacoes duplicadas 
+db.autoresInfo.update({
+    nome: "Fernando" 
+}, {
+    $set: {
+        nome: "Fernando Spelling"
+    }
+});
+
+db.artigos.update({
+    "autor.nome": "Fernando" 
+}, {
+    $set: {
+        "autor.nome": "Fernando Spelling"
+    }
+});
+
+// Vale destacar que a "escrita" do banco ficou um pouco complicada, pois se temos alguma informacao de autor para atualizar
+// e essa informacao possuir tambem na collection de artigos, sera feito a atualizacao nas duas collection, porem
+// quando pensamos em performance temos que analisar tanto a escrita como a leitura, e como eh obvio decidimos
+// priorizar a leitura
