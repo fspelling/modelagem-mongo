@@ -1,0 +1,74 @@
+// Vimos que no modelo conceitual que uma loja podera ter varios produtos, e um produto tera em varias lojas, portanto
+// o relacionamento sera (muitos para muitos).
+
+// Para implementar esse relacionamento vamos criar um campo array "produtos" na collection de "lojas", e um campo
+// array "vendidos_em" na collection "produtos".
+
+// Sabendo disso vamos realizar os seguintes updates para adicionar esses campos, comecando pela collection de produtos
+var magazineLuiza = db.lojas.findOne({ nome: "Magazine Luiza" });
+var fastShop = db.lojas.findOne({ nome: "Fast Shop" });
+
+db.produtos.update({
+    modelo : "Iphone 11",
+}, {
+    $set: {
+        vendidos_em: [magazineLuiza._id]
+    }
+});
+
+db.produtos.update({
+    modelo: "iPhone 8"
+}, {
+    $set: {
+        vendido_em: [magazineLuiza._id, fastShop._id]
+    }
+})
+
+db.produtos.update({
+    modelo: "Galaxy Note 10"
+}, {
+    $set: {
+        vendido_em: [magazineLuiza._id]
+    }
+})
+
+db.produtos.update({
+    modelo: "Redmi Go"
+}, {
+    $set: {
+        vendido_em: [fastShop._id]
+    }
+})
+
+// Agora vamos implementar na collection de lojas
+var produtosMagazine = db.produtos.find({
+    modelo: {
+        $in: ["Iphone 11", "iPhone 8", "Galaxy Note 10"]
+    }
+}).toArray();
+
+produtosMagazine.forEach(function(produto) {
+    db.lojas.update({
+        nome : "Magazine Luiza",
+    }, {
+        $push: {
+            produtos: produto._id
+        }
+    });
+});
+
+var produtosFast = db.produtos.find({
+    modelo: {
+        $in: ["iPhone 8", "Redmi Go"]
+    }
+}).toArray();
+
+produtosFast.forEach(function(produto) {
+    db.lojas.update({
+        nome : "Fast Shop",
+    }, {
+        $push: {
+            produtos: produto._id
+        }
+    });
+});

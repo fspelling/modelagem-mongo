@@ -1,0 +1,20 @@
+// No modelo conceitual vimos que um cliente tera somente um carrinho, e esse carrinho tera apenas aquele cliente,
+// ou seja, sera relacionando de "um para um", e nesse relacionamento o mongo cria um sub documento do documento
+// principal, que nesse caso o documento principal eh cliente e o seu sub documento sera o carrinho
+db.clientes.updateMany({}, {
+    $set: {
+        carrinho: {
+            produtos: []
+        }
+    }
+});
+
+// Buscando um produto e atualizando seu estoque(quantidade)
+var produto = db.produtos.findOneAndUpdate({
+    modelo: "Iphone 11",
+    quantidade: { $gt: 0 }
+}, {
+    $inc: {
+        quantidade: -1
+    }
+});

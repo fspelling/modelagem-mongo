@@ -1,0 +1,8 @@
+// Comecando, vamos criar a collection de lojas
+db.lojas.insertMany([{
+    nome: "Magazine Luiza",
+    endereco: "Av. Cruzeiro do Sul, 1100"
+}, {
+    nome: "Fast Shop",
+    endereco: "Av. Zaki Narchi, 1664"
+}]);

@@ -1,0 +1,63 @@
+// Analisando a nossa modelagem das lojas e produtos vimos que nao esta boa, pois o relacionamento muitos-para-muitos
+// esta desbalanceada!
+
+// Esta desbalanceada pois vimos que a adicao/remocao de produtos sera bem frequente, logo teremos muitos mais produtos 
+// do que lojas, alem dessa desbalanceada no relacionamento ser muito ruim, o trabalho que teremos de adiocionar
+// um produto sera custoso, pois sempre teremos que apos adiconar o produto, teremos que pegar seu _id adicionado
+// e adicionar na lista de produtos na collection de "lojas". Portanto a collection de "lojas" podera ter problemas,
+// tanto nesse trabalho de ficar lembrando e adionado a referencia do produto, tanto, e o mais impactante, do seu 
+// relacionamento desbalanceado.
+
+// Para resolver vamos re-modelar e tirar o campo "produtos" na collection de "lojas", atraves do operador $unset,
+// no metodo update()
+db.lojas.update({}, {
+    $unset: {
+        produtos: 1
+    }
+}, { multi: true });
+
+// Para testar vamos buscar em um produto quais sao suas lojas, como ja fizemos na sessao anterior
+db.produtos.aggregate([{
+    $match: {
+        modelo: "Iphone 11"
+    }
+}, {
+    $lookup: {
+        from: "lojas",
+        localField: "vendidos_em",
+        foreignField: "_id",
+        as: "listaLojas"
+    }
+}]);
+
+// Agora vamos buscar uma loja quais sao seus produtos, como ja fizemos na sessao anterior tambem
+db.lojas.aggregate([{
+    $match: {
+        nome: "Magazine Luiza"
+    }
+}, {
+    $lookup: {
+        from: "produtos",
+        localField: "produtos",
+        foreignField: "_id",
+        as: "listaProdutos"
+    }
+}]);
+
+// E obviamente nao teremos mais o resultado esperado, pois removemos o campo "produtos" da collection "lojas",
+// portanto teremos que buscar de forma diferente sem ser pelo aggregate, vamos buscar isoladamente qual loja em
+// questao, e em seguind com o find() vamos buscar quais produtos pertencem naquela loja
+var loja = db.lojas.findOne({
+    nome: "Magazine Luiza"
+});
+
+db.produtos.find({
+    vendido_em: loja._id
+});
+
+// Pronto, agora quando for adicionar um novo produto o trabalho sera feito apenas na collection de "produtos",
+// e nao temos mais preocupacoes em adiconar a referencia daquele produto na collection de "lojas" toda vez que
+// um produto for adicionado ou removido. E claramente nao teremos mais um relacionamento desbalanceado.
+
+// Vale destacar que sim, ainda temos um relacionamento muitos-para-muitos, apenas mudamos a forma que foi implementada
+// na nossa modelagem devido a nossas necessidades!

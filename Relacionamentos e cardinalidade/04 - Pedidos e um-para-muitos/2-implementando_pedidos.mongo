@@ -1,0 +1,52 @@
+// Agora vamos criar a collection de pedidos, e como a maioria dos dados esta na collection de clientes, iremos rodar
+// a agregacao com base nele.
+
+// Primeiramente vamos buscar todos os documentos onde o cliente for "Ricardo" atraves do operador $match
+db.clientes.aggregate([{
+    $match: {
+        nome: "Ricardo"
+    }
+}]);
+
+// Mapeando o retorno com os campos que queremos gravar na nova collection, atraves do operador $project,
+// vale destacar que no campo de retorno "total" precisamos usar o operador $sum para calcular a somatoria dos precos de
+// cada produto
+db.clientes.aggregate([{
+    $match: {
+        nome: "Ricardo"
+    }
+}, {
+    $project: {
+        _id: 0,
+        _idCliente: "$_id",
+        endereco: "$endereco",
+        data: ISODate(),
+        produtos: "$carrinho.produtos",
+        total: {
+            $sum: "$carrinho.produtos.preco"
+        }
+    }
+}]);
+
+// Para finalizar vamos gravar esse resultado na collection de pedidos, ate entao estavamos usando o operador $out
+// para isso, porem essa operacao apaga todos os documentos que existiam anteriormente na collection de destino, e nao
+// eh o que queremos, queremos que os dados anteriores da collection continuem na collection, sabendo disso usaremos
+// o operador $merge
+db.clientes.aggregate([{
+    $match: {
+        nome: "Ricardo"
+    }
+}, {
+    $project: {
+        _id: 0,
+        _idCliente: "$_id",
+        endereco: "$endereco",
+        data: ISODate(),
+        produtos: "$carrinho.produto",
+        total: {
+            $sum: "$carrinho.produto.preco"
+        }
+    }
+}, {
+    $merge: "pedidos"
+}]);

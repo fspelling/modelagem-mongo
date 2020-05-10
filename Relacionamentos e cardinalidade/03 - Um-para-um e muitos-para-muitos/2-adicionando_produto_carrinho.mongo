@@ -1,0 +1,25 @@
+// Buscando um produto e atualizando seu estoque(quantidade), vale destacar que vamos buscar apenas as informacoes
+// necessarias pra o carrinho, que seria o modelo, marca e preco, sabendo disso vamos usar a "projecao" do metodo find()
+var produto = db.produtos.findOneAndUpdate({
+    modelo: "Iphone 11",
+    quantidade: { $gt: 0 }
+}, {
+    $inc: {
+        quantidade: -1
+    }
+}, {
+    projection: {
+        marca: 1,
+        modelo: 1,
+        preco: 1
+    }
+});
+
+// Atualizando o carrinho do cliente com o produto acima
+db.clientes.update({
+    nome: "Giovani"
+}, {
+    $push: {
+        "carrinho.produtos": produto
+    }
+});

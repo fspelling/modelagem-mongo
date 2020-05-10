@@ -1,0 +1,45 @@
+// Buscando em uma loja quais sao seus produtos, vale destacar que nao vamos utilizar simplismente o find, pois teriamos
+// que realizar uma seria se buscas, sabendo disso usaremos o aggregate e inicialmente com o operador $match para buscar
+// primeiramente a loja
+db.lojas.aggregate([{
+    $match: {
+        nome: "Magazine Luiza"
+    }
+}]);
+
+// No resultamo veremos que temos todos os ids do produto da loja consultada, logo para buscarmos todo o detalhe de cada
+// produto teriamos que fazer uma especie de join, e para isso temos o operador $lookup, onde definimos alguns campos:
+// from -> collection do "join"
+// localField -> campo que reprsenta o "id" do array da collection principal/origem, que no cenario seria "lojas"
+// foreignField -> campo que representa o "_id" da collection de destino, que no cenario seria de "produtos"
+// as -> nomeia o campo da listagem do retorno
+db.lojas.aggregate([{
+    $match: {
+        nome: "Magazine Luiza"
+    }
+}, {
+    $lookup: {
+        from: "produtos",
+        localField: "produtos",
+        foreignField: "_id",
+        as: "listaProdutos"
+    }
+}]);
+
+// Agora vamos fazer o inverso, vamos buscar em um produto quais sao suas lojas
+db.produtos.aggregate([{
+    $match: {
+        modelo: "Iphone 11"
+    }
+}, {
+    $lookup: {
+        from: "lojas",
+        localField: "vendidos_em",
+        foreignField: "_id",
+        as: "listaLojas"
+    }
+}]);
+
+// Mas vale destacar que o $lookup nao tem so pontos positivos, pois se o nosso banco tivesse sido modelado
+// de uma forma distribuida, ou seja varias instancias do mongodb para que as collections possam se comunicar,
+// o $lookup nao funcionaria, e teriamos que utilizar outra abordagem

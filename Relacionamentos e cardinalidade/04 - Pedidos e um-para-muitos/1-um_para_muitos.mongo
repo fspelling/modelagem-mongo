@@ -1,0 +1,13 @@
+// Vimos que no modelo conceitual um pedido tera apenas um cliente, mas o cliente pode ter varios pedidos, portanto
+// o relacionamento sera (um para muitos).
+
+// Uma forma de fazer esse relacionamento seria semelhante quando fizemos com as entidades de cliente para 
+// carrinho(um para um), ou seja, criar a lista de documentos pedidos como documento interno da collection de clientes.
+
+// Porem parando para analisar, como queremos garantir um historico dos pedidos, cada documento de pedido que formos
+// adicionar na collection de clientes com o passar do tempo, poderemos ter um acumulo de dados para apenas um
+// documento na collection de clientes, e o mongo garanti apenas 16kb para cada documento, portanto no futuro teriamos
+// que fazer uma outra modelagem.
+
+// Sabendo disso, vamos criar uma nova collection chamada pedidos, e para cada documento do pedido, teremos um campo
+// referenciando o cliente daquele pedido.

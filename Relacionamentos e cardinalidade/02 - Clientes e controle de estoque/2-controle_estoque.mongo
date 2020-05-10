@@ -1,0 +1,40 @@
+// Atualizando a collection de produtos adicinando a quantidade de produtos para um controle de estoque
+db.produtos.update({
+    modelo: "Iphone 11"
+}, {
+    $set: {
+        quantidade: 7
+    }
+});
+
+db.produtos.update({
+    modelo: "Moto G7"
+}, {
+    $set: {
+        quantidade: 5
+    }
+});
+
+db.produtos.update({
+    modelo: "iPhone 8"
+}, {
+    $set: {
+        quantidade: 3
+    }
+});
+
+db.produtos.update({
+    modelo: "Galaxy Note 10"
+}, {
+    $set: {
+        quantidade: 11
+    }
+});
+
+db.produtos.update({
+    modelo: "Redmi Go"
+}, {
+    $set: {
+        quantidade: 4
+    }
+});

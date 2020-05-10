@@ -1,0 +1,14 @@
+// Criando a collection de "clientes"
+db.clientes.insert({
+    nome: "Giovani",
+    endereco: "Rua vergueiro, 3100",
+    email: "giovani@example.com",
+    senha: "giovani123"
+});
+
+db.clientes.insert({
+    nome: "Ricardo",
+    endereco: "Rua vergueiro, 3000",
+    email: "ricardo@example.com",
+    senha: "ricardo123"
+});
